@@ -10,6 +10,7 @@ namespace ProductService.Models
         public int CustomerId { get; set; }
         public Address Location { get; set; }
         public IList<Order> Orders { get; set; }
+        public DateTime Birthday { get; set; }
     }
 
     public class VipCustomer : Customer
