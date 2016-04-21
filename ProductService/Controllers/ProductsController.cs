@@ -183,6 +183,45 @@ namespace ProductService.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
+        [HttpPost]
+        public async Task<IHttpActionResult> Rate([FromODataUri] int key, ODataActionParameters parameters)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            int rating = (int) parameters["Rating"];
+            db.ProductRatings.Add(new ProductRating
+            {
+                ProductID = key,
+                Rating = rating
+            });
+
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                if (!ProductExists(key))
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        [HttpGet]
+        public IHttpActionResult MostExpensive()
+        {
+            var product = db.Products.Max(p => p.Price);
+            return Ok(product);
+        }
+
         private bool ProductExists(int key)
         {
             return db.Products.Any(p => p.Id == key);

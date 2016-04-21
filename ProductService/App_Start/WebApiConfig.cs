@@ -21,6 +21,17 @@ namespace ProductService
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Product>("Products");
             builder.EntitySet<Supplier>("Suppliers");
+            builder.Namespace = "ProductService";
+            builder.EntityType<Product>()
+                .Action("Rate")
+                .Parameter<int>("Rating");
+            builder.EntityType<Product>().Collection
+                .Function("MostExpensive")
+                .Returns<double>();
+            builder.Function("GetSalesTaxRate")
+                .Returns<double>()
+                .Parameter<int>("PostalCode");
+
             return builder.GetEdmModel();
         }
     }
