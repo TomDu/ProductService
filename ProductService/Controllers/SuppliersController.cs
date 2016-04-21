@@ -12,50 +12,50 @@ using ProductService.Models;
 
 namespace ProductService.Controllers
 {
-    public class ProductsController : ODataController
+    public class SuppliersController : ODataController
     {
         ProductsContext db = new ProductsContext();
 
         [EnableQuery]
-        public IQueryable<Product> Get()
+        public IQueryable<Supplier> Get()
         {
-            return db.Products;
+            return db.Suppliers;
         }
 
         [EnableQuery]
-        public SingleResult<Product> Get([FromODataUri] int key)
+        public SingleResult<Supplier> Get([FromODataUri] int key)
         {
-            IQueryable<Product> result = db.Products.Where(p => p.Id == key);
+            IQueryable<Supplier> result = db.Suppliers.Where(p => p.Id == key);
             return SingleResult.Create(result);
         }
 
-        public async Task<IHttpActionResult> Post(Product product)
+        public async Task<IHttpActionResult> Post(Supplier supplier)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            db.Products.Add(product);
+            db.Suppliers.Add(supplier);
             await db.SaveChangesAsync();
-            return Created(product);
+            return Created(supplier);
         }
 
-        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Product> product)
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Supplier> supplier)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var entity = await db.Products.FindAsync(key);
+            var entity = await db.Suppliers.FindAsync(key);
 
             if (entity == null)
             {
                 return NotFound();
             }
 
-            product.Patch(entity);
+            supplier.Patch(entity);
 
             try
             {
@@ -63,7 +63,7 @@ namespace ProductService.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductExists(key))
+                if (!SupplierExists(key))
                 {
                     return NotFound();
                 }
@@ -74,7 +74,7 @@ namespace ProductService.Controllers
             return Updated(entity);
         }
 
-        public async Task<IHttpActionResult> Put([FromODataUri] int key, Product update)
+        public async Task<IHttpActionResult> Put([FromODataUri] int key, Supplier update)
         {
             if (!ModelState.IsValid)
             {
@@ -94,7 +94,7 @@ namespace ProductService.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProductExists(key))
+                if (!SupplierExists(key))
                 {
                     return NotFound();
                 }
@@ -107,71 +107,45 @@ namespace ProductService.Controllers
 
         public async Task<IHttpActionResult> Delete([FromODataUri] int key)
         {
-            var product = await db.Products.FindAsync(key);
+            var supplier = await db.Suppliers.FindAsync(key);
 
-            if (product == null)
+            if (supplier == null)
             {
                 return NotFound();
             }
 
-            db.Products.Remove(product);
+            db.Suppliers.Remove(supplier);
             await db.SaveChangesAsync();
             return StatusCode(HttpStatusCode.NoContent);
         }
 
         [EnableQuery]
-        public SingleResult<Supplier> GetSupplier([FromODataUri] int key)
+        public IQueryable<Product> GetProducts([FromODataUri] int key)
         {
-            var result = db.Products.Where(p => p.Id == key).Select(p => p.Supplier);
-            return SingleResult.Create(result);
+            return db.Suppliers.Where(s => s.Id == key).SelectMany(s => s.Products);
         }
 
-        [AcceptVerbs("POST", "PUT")]
-        public async Task<IHttpActionResult> CreateRef([FromODataUri] int key, string navigationProperty,
-            [FromBody] Uri link)
+        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key, [FromODataUri] string relatedKey,
+            string navigationProperty)
         {
-            var product = await db.Products.SingleOrDefaultAsync(p => p.Id == key);
+            var supplier = await db.Suppliers.SingleOrDefaultAsync(s => s.Id == key);
 
-            if (product == null)
+            if (supplier == null)
             {
-                return NotFound();
+                return StatusCode(HttpStatusCode.NotFound);
             }
 
             switch (navigationProperty)
             {
-                case "Supplier":
-                    var relatedKey = Helpers.GetkeyFromUri<int>(Request, link);
-                    var supplier = await db.Suppliers.SingleOrDefaultAsync(s => s.Id == relatedKey);
+                case "Products":
+                    var productId = Convert.ToInt32(relatedKey);
+                    var product = await db.Products.SingleOrDefaultAsync(p => p.Id == productId);
 
-                    if (supplier == null)
+                    if (product == null)
                     {
                         return NotFound();
                     }
 
-                    product.Supplier = supplier;
-                    break;
-
-                default:
-                    return StatusCode(HttpStatusCode.NotImplemented);
-            }
-
-            await db.SaveChangesAsync();
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        public async Task<IHttpActionResult> DeleteRef([FromODataUri] int key, string navigationProperty,
-            [FromBody] Uri link)
-        {
-            var product = await db.Products.SingleOrDefaultAsync(p => p.Id == key);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            switch (navigationProperty)
-            {
-                case "Supplier":
                     product.Supplier = null;
                     break;
 
@@ -183,9 +157,9 @@ namespace ProductService.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        private bool ProductExists(int key)
+        private bool SupplierExists(int key)
         {
-            return db.Products.Any(p => p.Id == key);
+            return db.Suppliers.Any(s => s.Id == key);
         }
 
         protected override void Dispose(bool disposing)

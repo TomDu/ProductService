@@ -20,8 +20,7 @@ namespace ProductService
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Product>("Products");
-            //builder.EntitySet<Customer>("Customers");
-            //builder.EntitySet<Order>("Orders");
+            builder.EntitySet<Supplier>("Suppliers");
             return builder.GetEdmModel();
         }
     }
