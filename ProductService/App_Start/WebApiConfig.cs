@@ -19,9 +19,9 @@ namespace ProductService
         public static IEdmModel GetConventionModel()
         {
             var builder = new ODataConventionModelBuilder();
+            builder.Namespace = "ProductService";
             builder.EntitySet<Product>("Products");
             builder.EntitySet<Supplier>("Suppliers");
-            builder.Namespace = "ProductService";
             builder.EntityType<Product>()
                 .Action("Rate")
                 .Parameter<int>("Rating");
@@ -31,6 +31,7 @@ namespace ProductService
             builder.Function("GetSalesTaxRate")
                 .Returns<double>()
                 .Parameter<int>("PostalCode");
+            builder.Singleton<Supplier>("SuperSupplier");
 
             return builder.GetEdmModel();
         }
