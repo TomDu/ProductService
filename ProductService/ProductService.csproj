@@ -108,6 +108,16 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers.cs" />
+    <Compile Include="Migrations\201604210858598_InitialCreate.cs" />
+    <Compile Include="Migrations\201604210858598_InitialCreate.Designer.cs">
+      <DependentUpon>201604210858598_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201604220555323_AddField.cs" />
+    <Compile Include="Migrations\201604220555323_AddField.Designer.cs">
+      <DependentUpon>201604220555323_AddField.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProductRating.cs" />
     <Compile Include="Models\ProductsContext.cs" />
@@ -125,6 +135,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201604210858598_InitialCreate.resx">
+      <DependentUpon>201604210858598_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201604220555323_AddField.resx">
+      <DependentUpon>201604220555323_AddField.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

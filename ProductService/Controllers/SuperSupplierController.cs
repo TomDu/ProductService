@@ -24,6 +24,11 @@ namespace ProductService.Controllers
             {
                 Id = 0,
                 Name = "SuperSupplier",
+                Address = new Address
+                {
+                    Street = "Zixing Road",
+                    ZipCode = "200241"
+                },
                 Products = new List<Product>()
             };
         }
